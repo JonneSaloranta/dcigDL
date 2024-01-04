@@ -4,14 +4,49 @@ import os
 from decouple import config
 import re
 import asyncio
+import requests
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
 
 TOKEN = config('TOKEN')
+REPO_URL = config('REPO_URL')
+
+cwd = os.getcwd()
+
+CURRENT_VERSION = "v0.0.1-beta"
+
+def set_version():
+    with open("version.txt", "w") as file:
+        file.write(CURRENT_VERSION)
+
+def get_version():
+    if not os.path.exists("version.txt"):
+        with open("version.txt", "w") as file:
+            file.write(CURRENT_VERSION)
+    with open("version.txt", "r") as file:
+        version = file.read()
+    print("Current version: " + version)
+    return version
+
+def retrieve_latest_version():
+    try:
+        version = requests.get(REPO_URL + "/releases/latest").url.split("/")[-1]
+        print("Latest version: " + version)
+    except Exception as e:
+        print("Error retrieving latest version: " + str(e))
+        return None
+    return version
+
+def check_for_updates():
+    if get_version() == retrieve_latest_version():
+        print("Up to date!")
+    else:
+        print("Update available!")
 
 @client.event
 async def on_ready():
+    check_for_updates()
     print("Bot is ready and running!")
 
 @client.event
@@ -49,4 +84,7 @@ async def on_message(message):
             await message.channel.send(e)
             return
         
-client.run(TOKEN)
+try:
+    client.run(TOKEN)
+except Exception as e:
+    print(e)
