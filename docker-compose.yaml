@@ -1,10 +1,7 @@
 version: "3.8"
 services:
     app:
-        image: dcigdl:latest
-        build:
-            context: .
-            dockerfile: Dockerfile
+        image: slrnt/dcigdl:latest
         container_name: dcigDL
         environment:
             - TOKEN=your_bot_token
