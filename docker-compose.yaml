@@ -1,11 +1,14 @@
 version: "3.8"
 services:
     app:
-        build:
-            context: https://github.com/JonneSaloranta/dcigDL.git
-            dockerfile: Dockerfile
-        volumes:
-            - .:/app
+        image: dcigdl:latest
+        build: https://github.com/JonneSaloranta/dcigDL.git
+        container_name: dcigDL
         environment:
             - TOKEN=your_bot_token
             - REPO_URL=https://github.com/JonneSaloranta/dcigDL/ # url to check for updates
+            - PUID=1000
+            - PGID=1000
+        restart: unless-stopped
+        volumes:
+            - .:/app
