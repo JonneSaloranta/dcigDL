@@ -1,0 +1,4 @@
+discord==2.3.2
+python-decouple==3.8
+requests==2.31.0
+yt-dlp==2023.12.30
