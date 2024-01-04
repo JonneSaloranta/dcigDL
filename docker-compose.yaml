@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+    app:
+        build:
+            context: https://github.com/JonneSaloranta/dcigDL.git
+            dockerfile: Dockerfile
+        volumes:
+            - .:/app
+        environment:
+            - TOKEN=your_bot_token
+            - REPO_URL=https://github.com/JonneSaloranta/dcigDL/ # url to check for updates
