@@ -1,13 +1,16 @@
+FROM python:3.10-alpine as builder
+
+WORKDIR /app
+
+RUN apk update && \
+    apk add --no-cache git && \
+    git clone https://github.com/JonneSaloranta/dcigDL.git . && \
+    pip install -r requirements.txt
+
 FROM python:3.10-alpine
 
 WORKDIR /app
 
-RUN apk update
+COPY --from=builder /app /app
 
-COPY requirements.txt requirements.txt
-
-RUN pip install -r requirements.txt
-
-COPY . .
-
-CMD ["python", "app/main.py"]
+CMD ["python", "main.py"]
