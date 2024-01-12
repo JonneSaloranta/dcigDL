@@ -12,19 +12,25 @@ client = discord.Client(intents=intents)
 TOKEN = config('TOKEN')
 REPO_URL = config('REPO_URL')
 
-cwd = os.getcwd()
+# Updated path to include /app/data
+data_directory = "/app/data"
+if not os.path.exists(data_directory):
+    os.makedirs(data_directory)
+os.chdir(data_directory)
 
 CURRENT_VERSION = "v0.0.1-beta"
 
 def set_version():
-    with open("version.txt", "w") as file:
+    version_path = os.path.join(data_directory, "version.txt")
+    with open(version_path, "w") as file:
         file.write(CURRENT_VERSION)
 
 def get_version():
-    if not os.path.exists("version.txt"):
-        with open("version.txt", "w") as file:
+    version_path = os.path.join(data_directory, "version.txt")
+    if not os.path.exists(version_path):
+        with open(version_path, "w") as file:
             file.write(CURRENT_VERSION)
-    with open("version.txt", "r") as file:
+    with open(version_path, "r") as file:
         version = file.read()
     print("Current version: " + version)
     return version
@@ -68,23 +74,24 @@ async def on_message(message):
                     'quiet': True,
                     'no_warnings': True,
                     'ignoreerrors': True,
-                    'cookiefile': 'cookies.txt',
+                    'cookiefile': os.path.join(data_directory, 'cookies.txt'),
                     'geo_bypass': True,
                 }
                 with YoutubeDL(ydl_opts) as ydl:
                     ydl.download([convert_message])
-                for file in os.listdir("./"):
+                for file in os.listdir(data_directory):
                     if file.endswith(".mp4"):
-                        os.rename(file, "video.mp4")
-                        await message.channel.send(file=discord.File("video.mp4"))
+                        video_path = os.path.join(data_directory, file)
+                        os.rename(video_path, os.path.join(data_directory, "video.mp4"))
+                        await message.channel.send(file=discord.File(os.path.join(data_directory, "video.mp4")))
                         await asyncio.sleep(5)  # Await for 5 seconds
-                        os.remove("video.mp4")  # Remove the video file
+                        os.remove(os.path.join(data_directory, "video.mp4"))  # Remove the video file
                         
         except Exception as e:
-            await message.channel.send(e)
+            await message.channel.send(str(e))
             return
         
 try:
     client.run(TOKEN)
 except Exception as e:
-    print(e)
+    print(str(e))
